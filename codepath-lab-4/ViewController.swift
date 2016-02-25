@@ -14,10 +14,17 @@ class ViewController: UIViewController {
     @IBOutlet var panGestureRecognizer: UIPanGestureRecognizer!
     
     var trayOriginalCenter: CGPoint!
+    var trayPositionWhenOpen: CGPoint!
+    var trayPositionWhenClosed: CGPoint!
+    var trayIsOpen: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        trayPositionWhenClosed = CGPoint(x: trayView.center.x, y: trayView.center.y + 150)
+        trayPositionWhenOpen = CGPoint(x: trayView.center.x, y: trayView.center.y)
+        
+        trayView.center = trayPositionWhenClosed
     }
 
     override func didReceiveMemoryWarning() {
@@ -25,11 +32,13 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
+    @IBAction func onTrayTap(sender: AnyObject) {
+        toggleTray(CGFloat(1.0))
+    }
+    
     @IBAction func onTrayPanGesture(sender: UIPanGestureRecognizer) {
         // Absolute (x,y) coordinates in parent view (parentView should be
         // the parent view of the tray)
-        let point = panGestureRecognizer.locationInView(trayView)
         
         if panGestureRecognizer.state == UIGestureRecognizerState.Began {
             trayOriginalCenter = trayView.center
@@ -37,8 +46,21 @@ class ViewController: UIViewController {
             let translation = panGestureRecognizer.translationInView(trayView)
             trayView.center = CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y + translation.y)
         } else if panGestureRecognizer.state == UIGestureRecognizerState.Ended {
-            print("Gesture ended at: \(point)")
+            let velocity = panGestureRecognizer.velocityInView(trayView)
+            toggleTray(velocity.y)
         }
+    }
+    
+    func toggleTray(velocity: CGFloat) {
+        UIView.animateWithDuration(NSTimeInterval(0.5), delay: NSTimeInterval(0.0), usingSpringWithDamping: CGFloat(1.0), initialSpringVelocity: velocity, options: UIViewAnimationOptions.TransitionNone,
+            animations: { () -> Void in
+                if self.trayIsOpen {
+                    self.trayView.center = self.trayPositionWhenClosed
+                } else {
+                    self.trayView.center = self.trayPositionWhenOpen
+                }
+                self.trayIsOpen = !self.trayIsOpen
+            }) { (Bool) -> Void in }
     }
 }
 
