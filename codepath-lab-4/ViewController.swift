@@ -80,11 +80,11 @@ class ViewController: UIViewController {
             
             // Initialize the position of the new face.
             newlyCreatedFace.center = imageView.center
-            newFaceCenter = imageView.center
             
             // Since the original face is in the tray, but the new face is in the
             // main view, you have to offset the coordinates
             newlyCreatedFace.center.y += trayView.frame.origin.y
+            newFaceCenter = newlyCreatedFace.center
         } else if pgr.state == UIGestureRecognizerState.Changed {
             let translation = pgr.translationInView(newlyCreatedFace)
             newlyCreatedFace.center = CGPoint(x: newFaceCenter.x + translation.x, y: newFaceCenter.y + translation.y)
