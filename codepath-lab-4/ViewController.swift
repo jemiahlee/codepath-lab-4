@@ -84,10 +84,28 @@ class ViewController: UIViewController {
             // Since the original face is in the tray, but the new face is in the
             // main view, you have to offset the coordinates
             newlyCreatedFace.center.y += trayView.frame.origin.y
+            newlyCreatedFace.userInteractionEnabled = true
             newFaceCenter = newlyCreatedFace.center
         } else if pgr.state == UIGestureRecognizerState.Changed {
             let translation = pgr.translationInView(newlyCreatedFace)
             newlyCreatedFace.center = CGPoint(x: newFaceCenter.x + translation.x, y: newFaceCenter.y + translation.y)
+        } else if pgr.state == .Ended {
+            print("drag ended")
+            let pgr = UIPinchGestureRecognizer(target: self, action: "onFacePinch:")
+            let tgr = UITapGestureRecognizer(target: self, action: "onFaceTap:")
+            newlyCreatedFace.addGestureRecognizer(pgr)
+            newlyCreatedFace.addGestureRecognizer(tgr)
         }
+    }
+    
+    func onFaceTap(sender: AnyObject?) {
+        print("tapped my face")
+    }
+    
+    func onFacePinch(sender: AnyObject?) {
+        print("stop pinching my face")
+        let pgr = sender as! UIPinchGestureRecognizer
+        let imageView = pgr.view as! UIImageView
+        imageView.transform = CGAffineTransformScale(imageView.transform, pgr.scale, pgr.scale)
     }
 }
